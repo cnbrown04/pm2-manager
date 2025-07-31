@@ -1,14 +1,14 @@
-import { AuthForm } from "@/components/custom/auth-form";
-import { authClient } from "@/lib/auth/auth-client";
-import { createFileRoute, redirect } from "@tanstack/react-router";
-import { toast } from "sonner";
+import { createFileRoute, redirect } from '@tanstack/react-router';
+import { toast } from 'sonner';
+import { AuthForm } from '@/components/custom/auth-form';
+import { authClient } from '@/lib/auth/auth-client';
 
-export const Route = createFileRoute("/")({
+export const Route = createFileRoute('/')({
 	component: Home,
 });
 
 const IconMail = (props: React.SVGProps<SVGSVGElement>) => (
-	<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" {...props}>
+	<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" {...props}>
 		<title>Mail</title>
 		<path
 			d="M22 6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6zm-2 0-8 5-8-5h16zm0 12H4V8l8 5 8-5v10z"
@@ -18,102 +18,143 @@ const IconMail = (props: React.SVGProps<SVGSVGElement>) => (
 );
 
 const authFormProps = {
-	title: "Welcome Back",
-	description: "Sign in to your account",
+	title: 'Welcome Back',
+	description: 'Sign in to your account',
 	primaryAction: {
-		label: "Sign in with Email",
-		icon: <IconMail className="w-4 h-4 mr-2" />,
+		label: 'Sign in with Email',
+		icon: <IconMail className="mr-2 h-4 w-4" />,
 		expandsTo: {
-			title: "Sign In",
-			description: "Enter your credentials below",
+			title: 'Sign In',
+			description: 'Enter your credentials below',
 			fields: [
 				{
-					id: "email",
-					label: "Email",
-					type: "email",
-					placeholder: "Enter your email",
+					id: 'email',
+					label: 'Email',
+					type: 'email',
+					placeholder: 'Enter your email',
 					required: true,
 				},
 				{
-					id: "password",
-					label: "Password",
-					type: "password",
-					placeholder: "Enter your password",
+					id: 'password',
+					label: 'Password',
+					type: 'password',
+					placeholder: 'Enter your password',
 					required: true,
 				},
 			],
-			submitLabel: "Sign In",
-			loadingLabel: "Signing in...",
-			onSubmit: async (data: Record<string, string>) => {
+			submitLabel: 'Sign In',
+			loadingLabel: 'Signing in...',
+			onSubmit: async (submitData: Record<string, string>) => {
 				try {
-					// Implement sign in logic here
-					console.log("Email login:", data);
-					toast.success("Signed in successfully!");
-				} catch (error) {
-					toast.error("Failed to sign in. Please try again.");
-					throw error;
+					const { error: outerError } = await authClient.signIn.email(
+						{
+							email: submitData.email,
+							password: submitData.password,
+						},
+						{
+							onSuccess: () => {
+								toast.success(
+									'Logged in successfully! Redirecting...'
+								);
+								redirect({ to: '/dashboard' });
+							},
+							onError: () => {
+								toast.error('Error logging in', {
+									description:
+										outerError?.message || 'Unknown error',
+								});
+							},
+						}
+					);
+
+					if (outerError) {
+						throw new Error(
+							outerError.message || 'Failed to create account'
+						);
+					}
+				} catch (error: unknown) {
+					let errorMessage =
+						'Failed to create account. Please try again.';
+					if (
+						typeof error === 'object' &&
+						error !== null &&
+						'message' in error &&
+						typeof (error as { message: unknown }).message ===
+							'string'
+					) {
+						errorMessage = (error as { message: string }).message;
+					}
+					toast.error(errorMessage);
+					throw error; // Re-throw to keep the loading state and prevent form reset
 				}
 			},
 		},
 	},
 	secondaryActions: [
 		{
-			label: "Create Account",
+			label: 'Create Account',
 			expandsTo: {
-				title: "Create Account",
-				description: "Join us today",
+				title: 'Create Account',
+				description: 'Join us today',
 				fields: [
 					{
-						id: "name",
-						label: "Full Name",
-						placeholder: "Enter your full name",
+						id: 'name',
+						label: 'Full Name',
+						placeholder: 'Enter your full name',
 						required: true,
 					},
 					{
-						id: "email",
-						label: "Email",
-						type: "email",
-						placeholder: "Enter your email",
+						id: 'email',
+						label: 'Email',
+						type: 'email',
+						placeholder: 'Enter your email',
 						required: true,
 					},
 					{
-						id: "password",
-						label: "Password",
-						type: "password",
-						placeholder: "Create a password",
+						id: 'password',
+						label: 'Password',
+						type: 'password',
+						placeholder: 'Create a password',
 						required: true,
 					},
 				],
-				submitLabel: "Create Account",
-				loadingLabel: "Creating account...",
+				submitLabel: 'Create Account',
+				loadingLabel: 'Creating account...',
 				onSubmit: async (submitData: Record<string, string>) => {
 					try {
-						const { data, error } = await authClient.signUp.email(
-							{
-								email: submitData.email,
-								password: submitData.password,
-								name: submitData.name,
-							},
-							{
-								onSuccess: () => {
-									toast.success(
-										"Account created successfully! Please check your email to verify your account."
-									);
-									console.log("Account created successfully");
+						const { error: outerError } =
+							await authClient.signUp.email(
+								{
+									email: submitData.email,
+									password: submitData.password,
+									name: submitData.name,
 								},
-								onError: (error) => {
-									console.error("Error creating account:", error);
-									// This will be handled by the catch block below
-								},
-							}
-						);
-
-						if (error) {
-							throw new Error(error.message || "Failed to create account");
+								{
+									onSuccess: () => {
+										toast.success(
+											'Account created successfully! Redirecting...'
+										);
+										redirect({ to: '/dashboard' });
+									},
+									onError: () => {
+										toast.error('Error creating account', {
+											description:
+												outerError?.message ||
+												'Unknown error',
+										});
+										// This will be handled by the catch block below
+									},
+								}
+							);
+						if (outerError) {
+							throw new Error(
+								outerError.message || 'Failed to create account'
+							);
 						}
-					} catch (error: any) {
+					} catch (error: unknown) {
 						const errorMessage =
-							error?.message || "Failed to create account. Please try again.";
+							(error as { message?: string })?.message ||
+							'Failed to create account. Please try again.';
 						toast.error(errorMessage);
 						throw error; // Re-throw to keep the loading state and prevent form reset
 					}
@@ -127,7 +168,7 @@ function Home() {
 	const session = authClient.useSession();
 
 	if (session) {
-		return redirect({ to: "/dashboard" });
+		return redirect({ to: '/dashboard' });
 	}
 
 	return (

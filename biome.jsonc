@@ -1,0 +1,26 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.1.2/schema.json",
+  "extends": ["ultracite"],
+  "formatter": {
+    "indentStyle": "tab",
+    "indentWidth": 4
+  },
+  "linter": {
+    "rules": {
+      "complexity": {
+        "noExcessiveCognitiveComplexity": {
+          "level": "error",
+          "options": {
+            "maxAllowedComplexity": 50
+          }
+        }
+      },
+      "performance": {
+        "noImgElement": {
+          "level": "off",
+          "options": {}
+        }
+      }
+    }
+  }
+}
