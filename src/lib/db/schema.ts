@@ -7,40 +7,31 @@ import {
 	real,
 	blob,
 } from "drizzle-orm/sqlite-core";
-import { sql } from "drizzle-orm";
 import { createId } from "@paralleldrive/cuid2";
 
 // Authentication tables
 export const user = sqliteTable("user", {
-	id: text("id")
-		.primaryKey()
-		.$defaultFn(() => createId()),
+	id: text("id").primaryKey(),
 	name: text("name").notNull(),
 	email: text("email").notNull().unique(),
 	emailVerified: integer("email_verified", { mode: "boolean" })
-		.notNull()
-		.default(false),
+		.$defaultFn(() => false)
+		.notNull(),
 	image: text("image"),
-	createdAt: text("created_at")
-		.notNull()
-		.default(sql`CURRENT_TIMESTAMP`),
-	updatedAt: text("updated_at")
-		.notNull()
-		.default(sql`CURRENT_TIMESTAMP`),
+	createdAt: integer("created_at", { mode: "timestamp" })
+		.$defaultFn(() => /* @__PURE__ */ new Date())
+		.notNull(),
+	updatedAt: integer("updated_at", { mode: "timestamp" })
+		.$defaultFn(() => /* @__PURE__ */ new Date())
+		.notNull(),
 });
 
 export const session = sqliteTable("session", {
-	id: text("id")
-		.primaryKey()
-		.$defaultFn(() => createId()),
-	expiresAt: text("expires_at").notNull(),
+	id: text("id").primaryKey(),
+	expiresAt: integer("expires_at", { mode: "timestamp" }).notNull(),
 	token: text("token").notNull().unique(),
-	createdAt: text("created_at")
-		.notNull()
-		.default(sql`CURRENT_TIMESTAMP`),
-	updatedAt: text("updated_at")
-		.notNull()
-		.default(sql`CURRENT_TIMESTAMP`),
+	createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
+	updatedAt: integer("updated_at", { mode: "timestamp" }).notNull(),
 	ipAddress: text("ip_address"),
 	userAgent: text("user_agent"),
 	userId: text("user_id")
@@ -49,9 +40,7 @@ export const session = sqliteTable("session", {
 });
 
 export const account = sqliteTable("account", {
-	id: text("id")
-		.primaryKey()
-		.$defaultFn(() => createId()),
+	id: text("id").primaryKey(),
 	accountId: text("account_id").notNull(),
 	providerId: text("provider_id").notNull(),
 	userId: text("user_id")
@@ -60,27 +49,29 @@ export const account = sqliteTable("account", {
 	accessToken: text("access_token"),
 	refreshToken: text("refresh_token"),
 	idToken: text("id_token"),
-	accessTokenExpiresAt: text("access_token_expires_at"),
-	refreshTokenExpiresAt: text("refresh_token_expires_at"),
+	accessTokenExpiresAt: integer("access_token_expires_at", {
+		mode: "timestamp",
+	}),
+	refreshTokenExpiresAt: integer("refresh_token_expires_at", {
+		mode: "timestamp",
+	}),
 	scope: text("scope"),
 	password: text("password"),
-	createdAt: text("created_at")
-		.notNull()
-		.default(sql`CURRENT_TIMESTAMP`),
-	updatedAt: text("updated_at")
-		.notNull()
-		.default(sql`CURRENT_TIMESTAMP`),
+	createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
+	updatedAt: integer("updated_at", { mode: "timestamp" }).notNull(),
 });
 
 export const verification = sqliteTable("verification", {
-	id: text("id")
-		.primaryKey()
-		.$defaultFn(() => createId()),
+	id: text("id").primaryKey(),
 	identifier: text("identifier").notNull(),
 	value: text("value").notNull(),
-	expiresAt: text("expires_at").notNull(),
-	createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`),
-	updatedAt: text("updated_at").default(sql`CURRENT_TIMESTAMP`),
+	expiresAt: integer("expires_at", { mode: "timestamp" }).notNull(),
+	createdAt: integer("created_at", { mode: "timestamp" }).$defaultFn(
+		() => /* @__PURE__ */ new Date()
+	),
+	updatedAt: integer("updated_at", { mode: "timestamp" }).$defaultFn(
+		() => /* @__PURE__ */ new Date()
+	),
 });
 
 // PM2 Process Management tables
@@ -141,10 +132,10 @@ export const processes = sqliteTable("processes", {
 	namespace: text("namespace"),
 	createdAt: text("created_at")
 		.notNull()
-		.default(sql`CURRENT_TIMESTAMP`),
+		.$defaultFn(() => new Date().toISOString()),
 	updatedAt: text("updated_at")
 		.notNull()
-		.default(sql`CURRENT_TIMESTAMP`),
+		.$defaultFn(() => new Date().toISOString()),
 	createdBy: text("created_by").references(() => user.id),
 	tags: text("tags"), // JSON array of tags for categorization
 });
@@ -183,7 +174,7 @@ export const processStatus = sqliteTable("process_status", {
 	loadAvg: text("load_avg"), // JSON array of load averages [1, 5, 15]
 	timestamp: text("timestamp")
 		.notNull()
-		.default(sql`CURRENT_TIMESTAMP`),
+		.$defaultFn(() => new Date().toISOString()),
 	versioning: text("versioning"),
 	nodeEnv: text("node_env"),
 });
@@ -205,7 +196,7 @@ export const processMetrics = sqliteTable("process_metrics", {
 	httpP95Latency: real("http_p95_latency"),
 	timestamp: text("timestamp")
 		.notNull()
-		.default(sql`CURRENT_TIMESTAMP`),
+		.$defaultFn(() => new Date().toISOString()),
 });
 
 export const logs = sqliteTable("logs", {
@@ -217,7 +208,7 @@ export const logs = sqliteTable("logs", {
 	message: text("message").notNull(),
 	timestamp: text("timestamp")
 		.notNull()
-		.default(sql`CURRENT_TIMESTAMP`),
+		.$defaultFn(() => new Date().toISOString()),
 	level: text("level", { enum: ["info", "warn", "error", "debug"] }),
 	rawMessage: text("raw_message").notNull(),
 });
@@ -246,7 +237,7 @@ export const processEvents = sqliteTable("process_events", {
 	signal: text("signal"),
 	timestamp: text("timestamp")
 		.notNull()
-		.default(sql`CURRENT_TIMESTAMP`),
+		.$defaultFn(() => new Date().toISOString()),
 	triggeredBy: text("triggered_by"),
 	duration: integer("duration"),
 });
@@ -271,7 +262,7 @@ export const alerts = sqliteTable("alerts", {
 		.default(false),
 	createdAt: text("created_at")
 		.notNull()
-		.default(sql`CURRENT_TIMESTAMP`),
+		.$defaultFn(() => new Date().toISOString()),
 	resolvedAt: text("resolved_at"),
 	acknowledgedAt: text("acknowledged_at"),
 	acknowledgedBy: text("acknowledged_by"),
@@ -302,10 +293,10 @@ export const alertRules = sqliteTable("alert_rules", {
 	notificationChannels: text("notification_channels"), // JSON array of notification methods
 	createdAt: text("created_at")
 		.notNull()
-		.default(sql`CURRENT_TIMESTAMP`),
+		.$defaultFn(() => new Date().toISOString()),
 	updatedAt: text("updated_at")
 		.notNull()
-		.default(sql`CURRENT_TIMESTAMP`),
+		.$defaultFn(() => new Date().toISOString()),
 });
 
 export const processTemplates = sqliteTable("process_templates", {
@@ -319,10 +310,10 @@ export const processTemplates = sqliteTable("process_templates", {
 		.default(false),
 	createdAt: text("created_at")
 		.notNull()
-		.default(sql`CURRENT_TIMESTAMP`),
+		.$defaultFn(() => new Date().toISOString()),
 	updatedAt: text("updated_at")
 		.notNull()
-		.default(sql`CURRENT_TIMESTAMP`),
+		.$defaultFn(() => new Date().toISOString()),
 	createdBy: text("created_by").references(() => user.id),
 });
 
@@ -340,7 +331,7 @@ export const systemInfo = sqliteTable("system_info", {
 	uptime: integer("uptime").notNull(),
 	timestamp: text("timestamp")
 		.notNull()
-		.default(sql`CURRENT_TIMESTAMP`),
+		.$defaultFn(() => new Date().toISOString()),
 });
 
 export const auditLog = sqliteTable("audit_log", {
@@ -355,7 +346,7 @@ export const auditLog = sqliteTable("audit_log", {
 	userAgent: text("user_agent"),
 	timestamp: text("timestamp")
 		.notNull()
-		.default(sql`CURRENT_TIMESTAMP`),
+		.$defaultFn(() => new Date().toISOString()),
 });
 
 // Export all tables for relations

@@ -9,6 +9,7 @@ import {
 } from "@tanstack/react-router";
 
 import appCss from "@/styles/app.css?url";
+import { Toaster } from "sonner";
 
 export const Route = createRootRoute({
 	head: () => ({
@@ -61,6 +62,7 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
 			<body>
 				{children}
 				<Scripts />
+				<Toaster richColors />
 			</body>
 		</html>
 	);
