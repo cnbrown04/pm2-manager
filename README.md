@@ -17,7 +17,7 @@ A modern web application for managing PM2 processes built with React, TanStack R
 - **Styling**: Tailwind CSS v4 with shadcn/ui components
 - **Build Tool**: Vite
 - **Package Manager**: Bun (lockfile present)
-- **UI Components**: 
+- **UI Components**:
   - Radix UI primitives
   - shadcn/ui component library
   - Lucide React icons
@@ -33,19 +33,24 @@ A modern web application for managing PM2 processes built with React, TanStack R
 ### Installation
 
 1. Clone the repository:
+
 ```bash
 git clone <repository-url>
 cd pm2-manager
 ```
 
-2. Install dependencies:
+2. Install dependencies & run commands:
+
 ```bash
 bun install
+
+bunx drizzle-kit push
 ```
 
 ### Development
 
 Start the development server:
+
 ```bash
 bun run dev
 ```
@@ -55,6 +60,7 @@ The application will be available at `http://localhost:3000`.
 ### Building
 
 Build the application for production:
+
 ```bash
 bun run build
 ```
