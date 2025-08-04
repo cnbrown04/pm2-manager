@@ -4,6 +4,12 @@ import { AuthForm } from '@/components/custom/auth-form';
 import { authClient } from '@/lib/auth/auth-client';
 
 export const Route = createFileRoute('/')({
+	beforeLoad: async () => {
+		const session = await authClient.getSession();
+		if (session) {
+			throw redirect({ to: '/dashboard' });
+		}
+	},
 	component: Home,
 });
 
@@ -56,7 +62,7 @@ const authFormProps = {
 								toast.success(
 									'Logged in successfully! Redirecting...'
 								);
-								redirect({ to: '/dashboard' });
+								window.location.href = '/dashboard';
 							},
 							onError: () => {
 								toast.error('Error logging in', {
@@ -134,7 +140,7 @@ const authFormProps = {
 										toast.success(
 											'Account created successfully! Redirecting...'
 										);
-										redirect({ to: '/dashboard' });
+										window.location.href = '/dashboard';
 									},
 									onError: () => {
 										toast.error('Error creating account', {
@@ -165,12 +171,6 @@ const authFormProps = {
 };
 
 function Home() {
-	const session = authClient.useSession();
-
-	if (session) {
-		return redirect({ to: '/dashboard' });
-	}
-
 	return (
 		<div className="flex min-h-screen w-full items-center justify-center bg-background p-4">
 			<AuthForm className="w-full max-w-md" {...authFormProps} />

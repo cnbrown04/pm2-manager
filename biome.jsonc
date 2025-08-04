@@ -22,5 +22,8 @@
         }
       }
     }
+  },
+  "files": {
+    "includes": ["/src/components/*.{js,jsx,ts,tsx}"]
   }
 }

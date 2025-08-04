@@ -56,8 +56,10 @@ function NotFound() {
 function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
 	return (
 		<html lang="en">
-			{/* HeadContent should be rendered here instead of inside a <head> element */}
-			{<HeadContent />}
+			{/** biome-ignore lint/style/noHeadElement: Needed for hydration */}
+			<head>
+				<HeadContent />
+			</head>
 			<body>
 				{children}
 				<Scripts />

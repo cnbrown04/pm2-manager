@@ -182,7 +182,7 @@ const AuthForm = forwardRef<HTMLDivElement, AuthFormProps>(
 					className={cn(
 						'w-full max-w-md overflow-hidden',
 						// Entrance Animation
-						'fade-in-0 zoom-in-95 slide-in-from-bottom-4 animate-in duration-500'
+						'fade-in-0 zoom-in-95 slide-in-from-bottom-4 animate-in duration-150'
 					)}
 					ref={ref}
 					{...props}
@@ -195,7 +195,7 @@ const AuthForm = forwardRef<HTMLDivElement, AuthFormProps>(
 								exit={{ opacity: 0, y: -20 }}
 								initial={{ opacity: 0, y: 20 }}
 								key="main-view"
-								transition={{ duration: 0.3 }}
+								transition={{ duration: 0.1 }}
 							>
 								<CardHeader className="mb-4 px-4 text-center">
 									{/* Logo */}
@@ -330,7 +330,7 @@ const AuthForm = forwardRef<HTMLDivElement, AuthFormProps>(
 								exit={{ opacity: 0, y: -20 }}
 								initial={{ opacity: 0, y: 20 }}
 								key="expanded-view"
-								transition={{ duration: 0.3 }}
+								transition={{ duration: 0.1 }}
 							>
 								<CardHeader className="mb-4 px-4 text-center">
 									{/* Logo (smaller in expanded view) */}
@@ -339,7 +339,7 @@ const AuthForm = forwardRef<HTMLDivElement, AuthFormProps>(
 											animate={{ scale: 1 }}
 											className="mb-2 flex justify-center"
 											initial={{ scale: 1.2 }}
-											transition={{ duration: 0.3 }}
+											transition={{ duration: 0.1 }}
 										>
 											<img
 												alt={logoAlt}
@@ -391,7 +391,7 @@ const AuthForm = forwardRef<HTMLDivElement, AuthFormProps>(
 														{field.label}
 													</Label>
 													<Input
-														className="transition-all duration-200 focus:scale-[1.01]"
+														className="transition-all duration-75 focus:scale-[1.01]"
 														id={field.id}
 														onChange={(e) =>
 															handleInputChange(
